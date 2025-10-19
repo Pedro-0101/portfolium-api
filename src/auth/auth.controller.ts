@@ -1,6 +1,8 @@
-import { Controller, Get, Query, Redirect } from '@nestjs/common';
+import { Controller, Get, Query, Redirect, Req, Res } from '@nestjs/common';
 import { AuthGitService } from './service/authGit.service';
 import { gitAuthTokenDto } from './dto/gitAuthToken.dto';
+import type { Response } from 'express';
+import type { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -12,16 +14,29 @@ export class AuthController {
       `Acessando enpoint: https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=user`,
     );
     const url = `https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=user`;
-    return { url }; // o Nest faz o redirecionamento
+    return { url };
   }
 
   @Get('gitresponse')
-  async getGithubCode(@Query('code') code: string) {
+  async getGithubCode(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Query('code') code: string,
+  ) {
+    console.log(`Resposta do github code: ${code}`);
     if (!code) {
       throw new Error('Invalid code');
     }
-    console.log(`Resposta do github code: ${code}`);
+    
     const token: gitAuthTokenDto = await this.authGitService.executeAuth(code);
-    return token;
+
+    res.cookie('git_access_token', token.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production' ? false : true,
+      sameSite: 'lax',
+      maxAge: 60 * 1000,
+    });
+
+    return 'Success';
   }
 }

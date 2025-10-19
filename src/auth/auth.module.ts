@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { AuthGitService } from './service/authGit.service';
 import { AuthController } from './auth.controller';
+import { GetGitUserInfoService } from 'src/user/service/getGitUserInfo.service';
 
 @Module({
   imports: [
@@ -11,10 +12,10 @@ import { AuthController } from './auth.controller';
     AuthController
   ],
   providers: [
-    AuthGitService
+    AuthGitService, GetGitUserInfoService
   ],
   exports: [
-    AuthGitService
+    AuthGitService, GetGitUserInfoService
   ]
 })
 export class AuthModule {}
