@@ -39,7 +39,7 @@ export class AuthGitService {
       scope: res.data.scope,
       token_type: res.data.token_type,
     };
-    
+
     return token;
   }
 }

@@ -2,11 +2,11 @@ import { Controller, Get, Query, Redirect, Req, Res } from '@nestjs/common';
 import { AuthGitService } from './service/authGit.service';
 import { gitAuthTokenDto } from './dto/gitAuthToken.dto';
 import type { Response } from 'express';
-import type { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authGitService: AuthGitService) {}
+  
   @Get('github')
   @Redirect()
   async githubAuth() {
@@ -18,8 +18,8 @@ export class AuthController {
   }
 
   @Get('gitresponse')
+  //@Redirect()
   async getGithubCode(
-    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Query('code') code: string,
   ) {
@@ -27,16 +27,29 @@ export class AuthController {
     if (!code) {
       throw new Error('Invalid code');
     }
-    
+
     const token: gitAuthTokenDto = await this.authGitService.executeAuth(code);
 
     res.cookie('git_access_token', token.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' ? false : true,
+      secure: false,
       sameSite: 'lax',
-      maxAge: 60 * 1000,
+      maxAge: 60 * 60 * 1000,
     });
 
-    return 'Success';
+    // const url = 'http://192.168.1.19:5173';
+    // return { url };
+    return { token }
+  }
+
+  @Get('chato')
+  async returnCookie(@Res({ passthrough: true }) res: Response) {
+    const resp = 'o joao e chorao'
+    res.cookie('cookie_aleatorio', resp, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000,
+    });
   }
 }

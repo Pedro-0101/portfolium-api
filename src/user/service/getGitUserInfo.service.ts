@@ -7,6 +7,7 @@ export class GetGitUserInfoService {
   constructor(private readonly httpService: HttpService) {}
 
   async execute(auth: string) {
+    console.log('Buscando informacoes do usuario')
     const url = 'https://api.github.com/user';
 
     const res = await firstValueFrom(
