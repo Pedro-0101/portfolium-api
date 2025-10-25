@@ -115,7 +115,6 @@ export class UserController {
     description: 'Usuário não encontrado',
   })
   async getUser(@Param('id') id: string) {
-    console.log('User id: ' + id)
     const user = await this.getUserService.execute(id);
     return user;
   }

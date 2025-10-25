@@ -8,17 +8,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({ origin: true, credentials: true });
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   const config = new DocumentBuilder()
-  .setTitle('Portfolium api')
-  .setDescription('Api restrita para app portfolium')
-  .setVersion('1.0')
-  .build()
+    .setTitle('Portfolium api')
+    .setDescription('Api restrita para app portfolium')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
-}
+} 
 bootstrap();
