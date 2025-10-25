@@ -1,11 +1,30 @@
-import { Body, Controller, Get, Post, Req, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Req,
+  Res,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { GetGitUserInfoService } from './service/getGitUserInfo.service';
 import express from 'express';
 import { UserDto } from './dto/user.dto';
 import { CreateUserService } from './service/createUser.service';
 import { CreateUserDto } from './dto/createUser.dto';
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeader,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreatedUserModel } from './apiModel/createdUser.apiModel';
+import { GetUserService } from './service/getUser.service';
+import { ResponseGetUserApi } from './apiModel/responseGetUser.apiModel';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -13,6 +32,7 @@ export class UserController {
   constructor(
     private readonly getGitUserInfoService: GetGitUserInfoService,
     private readonly createUserService: CreateUserService,
+    private readonly getUserService: GetUserService,
   ) {}
 
   @Get('github')
@@ -71,5 +91,32 @@ export class UserController {
   async createUser(@Body() user: CreateUserDto): Promise<UserDto> {
     const createdUser = await this.createUserService.execute(user);
     return createdUser;
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Obtem um usuario especifico',
+    description:
+      'Obtem dados basicos de um usuario espcifico com base no id passado como parametro',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id do usuario',
+    required: true,
+    type: 'string',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados do usuario',
+    type: ResponseGetUserApi,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuário não encontrado',
+  })
+  async getUser(@Param('id') id: string) {
+    console.log('User id: ' + id)
+    const user = await this.getUserService.execute(id);
+    return user;
   }
 }

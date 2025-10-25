@@ -49,7 +49,7 @@ export class CreateUserDto {
   @Length(3, 50, {
     message: 'A ocupacao deve conter entre 3 e 50 caracteres'
   })
-  ocupation: string;
+  occupation: string;
 
   @ApiProperty({
     example: 'Ativo'

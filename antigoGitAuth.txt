@@ -1,0 +1,110 @@
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { gitAuthTokenDto } from '../dto/gitAuthToken.dto';
+import { GetGitUserInfoService } from 'src/user/service/getGitUserInfo.service';
+
+@Injectable()
+export class AuthGitService {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly getGitUserInfoService: GetGitUserInfoService,
+  ) {}
+
+  async executeAuth(code: string): Promise<gitAuthTokenDto> {
+    //TODO: Fazer tratamento de erro caso o token nao seja retornado
+
+    const url = 'https://github.com/login/oauth/access_token';
+    const body = new URLSearchParams({
+      client_id: process.env.CLIENT_ID ?? '',
+      client_secret: process.env.CLIENT_SECRET ?? '',
+      code,
+    });
+
+    const res = await firstValueFrom(
+      this.httpService.post(url, body.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/json',
+        },
+      }),
+    );
+
+    console.log('Token retornado pelo github: ');
+    console.log(res.data);
+
+    // TODO: Verificar se escopo retornado esta correto
+    const token: gitAuthTokenDto = {
+      access_token: res.data.access_token,
+      scope: res.data.scope,
+      token_type: res.data.token_type,
+    };
+
+    return token;
+  }
+}
+
+controller {
+  import { Controller, Get, Query, Redirect, Req, Res } from '@nestjs/common';
+import { AuthGitService } from './service/authGit.service';
+import { gitAuthTokenDto } from './dto/gitAuthToken.dto';
+import type { Response } from 'express';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authGitService: AuthGitService) {}
+  
+  @Get('github')
+  @Redirect()
+  async githubAuth() {
+    console.log(
+      `Acessando enpoint: https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=user`,
+    );
+    const url = `https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=user`;
+    return { url };
+  }
+
+  @Get('gitresponse')
+  //@Redirect()
+  async getGithubCode(
+    @Res({ passthrough: true }) res: Response,
+    @Query('code') code: string,
+  ) {
+    console.log(`Resposta do github code: ${code}`);
+    if (!code) {
+      throw new Error('Invalid code');
+    }
+
+    const token: gitAuthTokenDto = await this.authGitService.executeAuth(code);
+
+    res.cookie('git_access_token', token.access_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000,
+    });
+
+    // const url = 'http://192.168.1.19:5173';
+    // return { url };
+    return { token }
+  }
+
+  @Get('chato')
+  async returnCookie(@Res({ passthrough: true }) res: Response) {
+    const resp = 'o joao e chorao'
+    res.cookie('cookie_aleatorio', resp, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000,
+    });
+  }
+}
+
+}
+
+export class gitAuthTokenDto {
+  access_token: string;
+  scope: string;
+  token_type: string;
+}

@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios'
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProjectModule } from './project/project.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [UserModule, AuthModule,
@@ -16,7 +17,7 @@ import { ProjectModule } from './project/project.module';
     }),
     HttpModule,
   MongooseModule.forRoot(
-      'mongodb+srv://pedrocerquilho_db_user:1DpIRJyFHebvHDvI@cluster0.hmmpc4p.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+      process.env.MONGO_URI as string,
     ),
   ProjectModule,],
   controllers: [AppController, AuthController],

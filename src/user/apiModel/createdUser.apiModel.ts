@@ -23,7 +23,7 @@ export class CreatedUserModel {
     description: 'Ocupacao do usuario [estudante, desenvolvedor, ...]',
     example: 'Estudante'
   })
-  ocupation: string;
+  occupation: string;
 
   @ApiProperty({
     description: 'Status do usuario [ativo, inativo]',

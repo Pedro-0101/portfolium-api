@@ -1,5 +1,3 @@
-import { ProjectDto } from 'src/project/dtos/project.dto';
-
 export class UserDto {
   name: string;
   email: string;
@@ -10,7 +8,7 @@ export class UserDto {
   country: string;
   location: string;
   about?: string;
-  ocupation: string;
+  occupation: string;
   tags?: string[];
   projects?: string[];
   status: string;

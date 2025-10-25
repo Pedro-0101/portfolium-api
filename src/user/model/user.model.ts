@@ -34,7 +34,7 @@ export class User extends Document {
   about: string;
 
   @Prop({ required: true })
-  ocupation: string;
+  occupation: string;
 
   @Prop({ required: false })
   tags: string[];

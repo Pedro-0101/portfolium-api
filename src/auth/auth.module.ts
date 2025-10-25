@@ -1,21 +1,9 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { AuthGitService } from './service/authGit.service';
 import { AuthController } from './auth.controller';
-import { GetGitUserInfoService } from 'src/user/service/getGitUserInfo.service';
+import { AuthService } from './auth.service';
 
 @Module({
-  imports: [
-    HttpModule
-  ],
-  controllers: [
-    AuthController
-  ],
-  providers: [
-    AuthGitService, GetGitUserInfoService
-  ],
-  exports: [
-    AuthGitService, GetGitUserInfoService
-  ]
+  controllers: [AuthController],
+  providers: [AuthService]
 })
 export class AuthModule {}
