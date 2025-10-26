@@ -14,7 +14,7 @@ import { GetGitUserInfoService } from './service/getGitUserInfo.service';
 import express from 'express';
 import { UserDto } from './dto/user.dto';
 import { CreateUserService } from './service/createUser.service';
-import { CreateUserDto } from './dto/createUser.dto';
+import { CreateUserEssentialDto } from './dto/createUserEssential.dto';
 import {
   ApiHeader,
   ApiOperation,
@@ -25,6 +25,7 @@ import {
 import { CreatedUserModel } from './apiModel/createdUser.apiModel';
 import { GetUserService } from './service/getUser.service';
 import { ResponseGetUserApi } from './apiModel/responseGetUser.apiModel';
+import { Public } from 'src/decorators/public.decorator';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -70,7 +71,8 @@ export class UserController {
   }
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @Public()
+  //@UsePipes(new ValidationPipe({ transform: true }))
   @ApiOperation({
     summary: 'Cria um usuario',
     description: 'Cria um usuario, somente campos essenciais',
@@ -88,7 +90,8 @@ export class UserController {
     status: 500,
     description: 'Erro interno do servidor',
   })
-  async createUser(@Body() user: CreateUserDto): Promise<UserDto> {
+  async createUser(@Body() user: CreateUserEssentialDto): Promise<UserDto> {
+    console.log(user)
     const createdUser = await this.createUserService.execute(user);
     return createdUser;
   }

@@ -28,11 +28,4 @@ export class AuthController {
     );
     return jwtToken;
   }
-
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @Get('profile')
-  getProfile() {
-    return 'Use guards funciona';
-  }
 }

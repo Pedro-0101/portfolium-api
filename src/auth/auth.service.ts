@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { GetUsernamePassRepository } from 'src/user/repositories/getUsernamePass.repository';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,11 @@ export class AuthService {
   ): Promise<{ access_token: string }> {
     const user = await this.getUsernamePassRepository.execute(username);
 
-    if (user?.pass !== pass) {
+    const saltOrRounds = Number(process.env.BCRYPT_ROUNDS) || 10;
+    const password = pass;
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+
+    if (user?.pass !== hashedPassword) {
       throw new UnauthorizedException();
     }
 
