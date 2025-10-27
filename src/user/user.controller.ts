@@ -1,34 +1,19 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Req,
-  Res,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
-import { GetGitUserInfoService } from './service/getGitUserInfo.service';
 import express from 'express';
-import { UserDto } from './dto/user.dto';
-import { CreateUserService } from './service/createUser.service';
-import { CreateUserEssentialDto } from './dto/createUserEssential.dto';
-import {
-  ApiHeader,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { CreatedUserModel } from './apiModel/createdUser.apiModel';
-import { GetUserService } from './service/getUser.service';
-import { ResponseGetUserApi } from './apiModel/responseGetUser.apiModel';
-import { Public } from 'src/decorators/public.decorator';
+import { Body, Param, Req } from '@nestjs/common';
 
-@ApiTags('UserController')
-@Controller('user')
+import { UserDto } from './dto/user.dto';
+import { CreateUserEssentialDto } from './dto/createUserEssential.dto';
+
+import { GetGitUserInfoService } from './service/getGitUserInfo.service';
+import { CreateUserService } from './service/createUser.service';
+import { GetUserService } from './service/getUser.service';
+
+import { CreateUserDecorator } from './decorators/createUser.post.decorator';
+import { GetGitUserInfoDecorator } from './decorators/getGitUserInfo.get.decorator';
+import { GetUserByIdDecorator } from './decorators/getUserById.get.decorator';
+import { UserControllerDecorator } from './decorators/userController.decorator';
+
+@UserControllerDecorator()
 export class UserController {
   constructor(
     private readonly getGitUserInfoService: GetGitUserInfoService,
@@ -36,30 +21,7 @@ export class UserController {
     private readonly getUserService: GetUserService,
   ) {}
 
-  @Get('github')
-  @ApiOperation({
-    summary: 'Endpoint que retorna dados do github do usuario',
-    description:
-      'Verifica se o header possui o token de validacao do github e entao faz a requisicao das informacoes a api do github',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Retorna dados do usuario refentes ao gitHub, como nome, email, avatar, numero de repositorios, ultimo commit, etc...',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Authorization fornecida nao e valida',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Erro interno do servidor',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Token validado do github',
-    required: true,
-  })
+  @GetGitUserInfoDecorator()
   async getGitUserInfo(@Req() req: express.Request) {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
@@ -70,52 +32,13 @@ export class UserController {
     return user;
   }
 
-  @Post()
-  @Public()
-  @UsePipes(new ValidationPipe({ transform: true }))
-  @ApiOperation({
-    summary: 'Cria um usuario',
-    description: 'Cria um usuario, somente campos essenciais',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Usuario criado com sucesso',
-    type: CreatedUserModel,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Nao foi possivel criar o usuario',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Erro interno do servidor',
-  })
+  @CreateUserDecorator()
   async createUser(@Body() user: CreateUserEssentialDto): Promise<UserDto> {
     const createdUser = await this.createUserService.execute(user);
     return createdUser;
   }
 
-  @Get(':id')
-  @ApiOperation({
-    summary: 'Obtem um usuario especifico',
-    description:
-      'Obtem dados basicos de um usuario espcifico com base no id passado como parametro',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'Id do usuario',
-    required: true,
-    type: 'string',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Dados do usuario',
-    type: ResponseGetUserApi,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Usuário não encontrado',
-  })
+  @GetUserByIdDecorator()
   async getUser(@Param('id') id: string) {
     const user = await this.getUserService.execute(id);
     return user;

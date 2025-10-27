@@ -31,7 +31,7 @@ export class CreateUserService {
     }
 
     // Fazendo hash da senha
-    const saltOrRounds = parseInt(process.env.BCRYPT_ROUNDS ?? '', 10);
+    const saltOrRounds = Number(process.env.BCRYPT_ROUNDS);
     const password = userDto.password;
     const hashedPassword = await bcrypt.hash(password, saltOrRounds);
 

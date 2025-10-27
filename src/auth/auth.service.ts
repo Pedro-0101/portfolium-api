@@ -16,12 +16,20 @@ export class AuthService {
   ): Promise<{ access_token: string }> {
     const user = await this.getUsernamePassRepository.execute(username);
 
-    const saltOrRounds = Number(process.env.BCRYPT_ROUNDS) || 10;
-    const password = pass;
-    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+    // Verifica se usuário existe
+    if (!user) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
 
-    if (user?.pass !== hashedPassword) {
-      throw new UnauthorizedException();
+    const storedHash = user.pass;
+    if (!storedHash) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    // compara a senha plain com o hash armazenado
+    const match = await bcrypt.compare(pass, storedHash);
+    if (!match) {
+      throw new UnauthorizedException('Credenciais inválidas');
     }
 
     const payload = { sub: user.id, username: user.username };

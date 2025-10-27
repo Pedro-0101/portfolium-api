@@ -1,15 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
 
 export class SignInDto {
-  @ApiProperty({ example: 'UserName' })
-  @Transform(({ obj }) => obj.username ?? obj.Username ?? obj.user ?? obj.User)
+  @ApiProperty({
+    name: 'username',
+    description: 'Username do usuario',
+    example: 'Username',
+  })
   @IsString()
   username: string;
 
-  @ApiProperty({ example: 'SenhaForte!' })
-  @Transform(({ obj }) => obj.password ?? obj.Password ?? obj.pass ?? obj.Pass)
+  @ApiProperty({
+    name: 'password',
+    description: 'Senha do usuario',
+    example: 'SenhaForte!',
+  })
   @IsString()
   password: string;
 }

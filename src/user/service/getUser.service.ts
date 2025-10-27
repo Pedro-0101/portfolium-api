@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { GetUserRepository } from '../repositories/getUser.repository';
-import { ResponseGetUserApi } from '../apiModel/responseGetUser.apiModel';
 import mongoose from 'mongoose';
+import { ResponseGetUserDto } from '../dto/responseGetUser.dto';
 
 @Injectable()
 export class GetUserService {
   constructor(private readonly getUserRepository: GetUserRepository) {}
 
-  async execute(id: string): Promise<ResponseGetUserApi> {
+  async execute(id: string): Promise<ResponseGetUserDto> {
     if (!id || typeof id !== 'string') {
       throw new BadRequestException('ID ausente ou inválido');
     }
@@ -24,7 +24,7 @@ export class GetUserService {
     throw new NotFoundException('Usuario nao encontrado')
   }
 
-    const userApi: ResponseGetUserApi = userDto;
+    const userApi: ResponseGetUserDto = userDto;
     return userApi;
   }
 }
