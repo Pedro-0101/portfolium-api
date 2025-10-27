@@ -6,7 +6,7 @@ const countryName = countries.map((c) => c.nome_pais_int);
 
 export class CreateUserEssentialDto {
   @ApiProperty({
-    name: 'Username',
+    name: 'name',
     example: 'Usuario da Silva',
   })
   @IsString()
@@ -17,7 +17,7 @@ export class CreateUserEssentialDto {
   name: string;
 
   @ApiProperty({
-    name: 'Email',
+    name: 'email',
     example: 'email.email@email.com',
   })
   @IsString()
@@ -26,7 +26,7 @@ export class CreateUserEssentialDto {
   email: string;
 
   @ApiProperty({
-    name: 'Password',
+    name: 'password',
     example: 'SenhaForte!',
   })
   @IsString()
@@ -37,7 +37,7 @@ export class CreateUserEssentialDto {
   password: string;
 
   @ApiProperty({
-    name: 'Country',
+    name: 'country',
     example: 'Brazil',
   })
   @IsString()
@@ -47,7 +47,7 @@ export class CreateUserEssentialDto {
   country: string;
 
   @ApiProperty({
-    name: 'Occupation',
+    name: 'occupation',
     example: 'Estudante',
   })
   @IsString()

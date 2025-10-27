@@ -72,7 +72,7 @@ export class UserController {
 
   @Post()
   @Public()
-  //@UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOperation({
     summary: 'Cria um usuario',
     description: 'Cria um usuario, somente campos essenciais',
@@ -91,7 +91,6 @@ export class UserController {
     description: 'Erro interno do servidor',
   })
   async createUser(@Body() user: CreateUserEssentialDto): Promise<UserDto> {
-    console.log(user)
     const createdUser = await this.createUserService.execute(user);
     return createdUser;
   }

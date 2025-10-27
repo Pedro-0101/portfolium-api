@@ -1,17 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserRepository } from '../repositories/createUser.repository';
 import { CreateUserEssentialDto } from '../dto/createUserEssential.dto';
-import { UserDto } from '../dto/user.dto';
 import { CreateCompleteUserDto } from '../dto/createCompleteUser.dto';
 import * as bcrypt from 'bcrypt';
+import { instanceToInstance } from 'class-transformer';
+import { ResponseCreatedUserDto } from '../dto/responseCreatedUserDto';
+import { userDocument } from '../model/user.model';
+import { GetUserByEmailService } from './getUserByEmail.service';
+import { GetUserByNameService } from './getUserByName.service';
 
 @Injectable()
 export class CreateUserService {
-  constructor(private readonly createUserRepository: CreateUserRepository) {}
+  constructor(
+    private readonly createUserRepository: CreateUserRepository,
+    private readonly getUserByEmailService: GetUserByEmailService,
+    private readonly getUserByNameService: GetUserByNameService,
+  ) {}
 
   async execute(userDto: CreateUserEssentialDto): Promise<any> {
+    // Verificar se nome e email nao existem
+    const existName = await this.getUserByNameService.execute(userDto.name);
+    const existEmail = await this.getUserByEmailService.execute(userDto.email);
+    
+    if (existName) {
+      throw new BadRequestException('Nome ja existente');
+    }
+
+    if (existEmail) {
+      throw new BadRequestException('Email ja existente');
+    }
+
     // Fazendo hash da senha
-    const saltOrRounds = Number(process.env.BCRYPT_ROUNDS) || 10;
+    const saltOrRounds = parseInt(process.env.BCRYPT_ROUNDS ?? '', 10);
     const password = userDto.password;
     const hashedPassword = await bcrypt.hash(password, saltOrRounds);
 
@@ -53,10 +73,19 @@ export class CreateUserService {
       notifications: defaultNotifications,
     };
 
-    const createdUser = await this.createUserRepository.execute(CompleteUser);
+    // Aguarda retorno do repositorio
+    const createdUser: userDocument =
+      await this.createUserRepository.execute(CompleteUser);
 
-    console.log(createdUser);
+    // Transforma no dto para resposta
+    const responseCreatedUser = instanceToInstance(
+      Object.assign(new ResponseCreatedUserDto(), createdUser),
+      {
+        excludeExtraneousValues: true,
+        exposeUnsetFields: true,
+      },
+    );
 
-    return createdUser;
+    return responseCreatedUser;
   }
 }

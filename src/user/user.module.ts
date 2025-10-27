@@ -8,6 +8,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './model/user.model';
 import { GetUserService } from './service/getUser.service';
 import { GetUserRepository } from './repositories/getUser.repository';
+import { GetUserByEmailService } from './service/getUserByEmail.service';
+import { GetUserByEmailRepository } from './repositories/getUserByEmail.repository';
+import { GetUserByNameRepository } from './repositories/getUserByName.repository';
+import { GetUserByNameService } from './service/getUserByName.service';
 
 @Module({
   controllers: [UserController],
@@ -21,6 +25,10 @@ import { GetUserRepository } from './repositories/getUser.repository';
     CreateUserRepository,
     GetUserService,
     GetUserRepository,
+    GetUserByEmailService,
+    GetUserByEmailRepository,
+    GetUserByNameService,
+    GetUserByNameRepository,
   ],
   exports: [
     GetGitUserInfoService,
@@ -28,6 +36,10 @@ import { GetUserRepository } from './repositories/getUser.repository';
     CreateUserRepository,
     GetUserService,
     GetUserRepository,
+    GetUserByEmailService,
+    GetUserByEmailRepository,
+    GetUserByNameService,
+    GetUserByNameRepository,
   ],
 })
 export class UserModule {}
