@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { GetUserRepository } from '../repositories/getUser.repository';
 import mongoose from 'mongoose';
 import { ResponseGetUserDto } from '../dto/responseGetUser.dto';
@@ -18,13 +22,25 @@ export class GetUserService {
       throw new BadRequestException('O id passado nao e um id valido');
     }
 
-    const userDto = await this.getUserRepository.execute(cleanId);
+    const userRepository = await this.getUserRepository.execute(cleanId);
 
-  if(!userDto || userDto === undefined) {
-    throw new NotFoundException('Usuario nao encontrado')
-  }
+    if (!userRepository || userRepository === undefined) {
+      throw new NotFoundException('Usuario nao encontrado');
+    }
+    // TODO: Funcao para retornar numero de followers e following
+    const responseUser: ResponseGetUserDto = {
+      id: String(userRepository._id),
+      name: userRepository.name,
+      avatar_url: userRepository.avatar_url,
+      banner_url: userRepository.banner_url,
+      followers: 0,
+      following: 0,
+      comunities: userRepository.comunities,
+      theme: userRepository.theme,
+      language: userRepository.language,
+      notifications: userRepository.notifications,
+    };
 
-    const userApi: ResponseGetUserDto = userDto;
-    return userApi;
+    return responseUser;
   }
 }

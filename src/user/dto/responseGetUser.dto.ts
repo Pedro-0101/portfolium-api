@@ -1,7 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
+/**
+ * id: string
+ * name: string
+ * avatar_url: string
+ * banner_url: string
+ * followers: number
+ * following: number
+ * comunities: string[]
+ * theme: string
+ * language: string
+ */
+
 export class ResponseGetUserDto {
+  @ApiProperty({
+    name: 'id',
+    description: 'Id do usuario',
+    example: '68feccad77d850d633c1548d',
+  })
+  @Expose()
+  id: string;
+
   @ApiProperty({
     name: 'username',
     description: 'Username do usuario',

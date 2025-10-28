@@ -20,6 +20,7 @@ import { APP_GUARD } from '@nestjs/core';
         expiresIn: '60m',
       },
     }),
+    UserModule,
   ],
   controllers: [AuthController],
   providers: [

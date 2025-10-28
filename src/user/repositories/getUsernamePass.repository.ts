@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, userDocument } from '../model/user.model';
-import { UserAuthDto } from '../dto/usernamePass.dto';
+import { UserAuthDto } from '../dto/userAuth.dto';
 
 @Injectable()
 export class GetUsernamePassRepository {
@@ -19,11 +19,11 @@ export class GetUsernamePassRepository {
       throw new NotFoundException('Username ou senha incorretos');
     }
 
-    const user = {
-      id: foundUser._id as string,
+    const user: UserAuthDto = {
+      id: String(foundUser._id),
       username: foundUser.name,
       pass: foundUser.password,
-    } satisfies UserAuthDto;
+    }
 
     return user;
   }
